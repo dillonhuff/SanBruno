@@ -16,6 +16,8 @@ namespace SanBruno {
   };
 
   class Context {
+
+    std::map<std::string, Function*> functions;
   public:
 
     Data* arrayType(const int width) {
@@ -25,7 +27,15 @@ namespace SanBruno {
     Function* newFunction(const std::string& name,
                           const std::map<std::string, Data*>& inputs,
                           const std::map<std::string, Data*>& outputs) {
-      return nullptr;
+      auto f = new Function();
+      functions.insert({name, f});
+      return f;
+    }
+
+    ~Context() {
+      for (auto f : functions) {
+        delete f.second;
+      }
     }
   };
 
