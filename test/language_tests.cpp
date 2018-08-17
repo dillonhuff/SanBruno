@@ -13,7 +13,16 @@ namespace SanBruno {
 
     REQUIRE(p != nullptr);
 
-    
+    // Now: Create function definition and test it
+    Value* aSgnBit = p->addSlice(31, 31, p->getValue("a"));
+    Value* bSgnBit = p->addSlice(31, 31, p->getValue("b"));
+
+    Value* res = p->addEquals(aSgnBit, bSgnBit);
+
+    Value* resSignBit =
+      p->addCase(res,
+                 p->addConstant(1, 1),
+                 p->addConstant(1, 0));
   }
 
 }
