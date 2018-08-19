@@ -2,6 +2,8 @@
 
 #include "algorithm.h"
 
+#include <fstream>
+
 using namespace dbhc;
 
 namespace SanBruno {
@@ -67,9 +69,16 @@ namespace SanBruno {
   };
   
   class Function {
+    std::string name;
     std::vector<Statement*> statements;
 
   public:
+
+    Function(const std::string& name_) : name(name_) {}
+
+    std::string getName() const {
+      return name;
+    }
 
     std::vector<Statement*> getStatements() const {
       return statements;
@@ -132,20 +141,29 @@ namespace SanBruno {
     Function* newFunction(const std::string& name,
                           const std::map<std::string, Data*>& inputs,
                           const std::map<std::string, Data*>& outputs) {
-      auto f = new Function();
+      auto f = new Function(name);
       functions.insert({name, f});
       return f;
     }
 
     // Synthesize by unfolding the entire compute graph
     void synthesizeNaive(const std::string& functionName) {
+
+
       Function* f = map_find(functionName, functions);
+
+      std::string verilogFile = f->getName() + ".v";
+      std::ofstream of(verilogFile);
+
+      of << "module " << f->getName() << "();" << std::endl;
 
       for (auto stmt : f->getStatements()) {
         std::cout << stmt->toString(0) << std::endl;
       }
 
-      assert(false);
+      of << "endmodule";
+        
+      of.close();
 
     }
 

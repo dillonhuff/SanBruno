@@ -2,7 +2,23 @@
 
 #include "language.h"
 
+using namespace std;
+
 namespace SanBruno {
+
+  bool runCmd(const std::string& cmd) {
+    int res = system(cmd.c_str());
+    return res == 0;
+  }
+
+  bool runVerilatorTB(const std::string& moduleName) {
+    string verilogFileName = moduleName + ".v";
+    string tbName = moduleName + "_tb.cpp";
+    string verilatorStr = "verilator --cc " + verilogFileName + " --exe " + tbName + " --top-module " + moduleName;
+
+    bool verilatorCompiled = runCmd(verilatorStr);
+    return verilatorCompiled;
+  }
 
   TEST_CASE("Express 32 bit add sign bit computation") {
     Context c;
@@ -31,6 +47,7 @@ namespace SanBruno {
     // Synthesize this function
     c.synthesizeNaive("float_add_32_sign_bit");
 
+    REQUIRE(runVerilatorTB("float_add_32_sign_bit"));
     
   }
 
