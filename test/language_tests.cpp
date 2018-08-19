@@ -13,11 +13,28 @@ namespace SanBruno {
 
   bool runVerilatorTB(const std::string& moduleName) {
     string verilogFileName = moduleName + ".v";
-    string tbName = moduleName + "_tb.cpp";
+    string tbName = "./test/tbs/" + moduleName + "_tb.cpp";
     string verilatorStr = "verilator --cc " + verilogFileName + " --exe " + tbName + " --top-module " + moduleName;
 
+    cout << "Verilator str = " << verilatorStr << endl;
+
     bool verilatorCompiled = runCmd(verilatorStr);
-    return verilatorCompiled;
+
+    if (!verilatorCompiled) {
+      return false;
+    }
+
+    string makeTbStr = "make -C obj_dir -j -f V" + moduleName + ".mk V" + moduleName;
+    bool makeRes = runCmd(makeTbStr);
+
+    if (!makeRes) {
+      return false;
+    }
+
+    string runVerilatorStr = "./obj_dir/V" + moduleName;
+    bool verilatorRan = runCmd(runVerilatorStr);
+    
+    return verilatorRan;
   }
 
   TEST_CASE("Express 32 bit add sign bit computation") {
@@ -48,7 +65,6 @@ namespace SanBruno {
     c.synthesizeNaive("float_add_32_sign_bit");
 
     REQUIRE(runVerilatorTB("float_add_32_sign_bit"));
-    
   }
 
 }
